@@ -1,4 +1,5 @@
 library(shiny)
+library(ggplot2)
 
 # Define UI for data upload app ----
 ui <- fluidPage(
@@ -54,7 +55,8 @@ ui <- fluidPage(
     mainPanel(
       plotOutput("histogram"),
       # Output: Data file ----
-      tableOutput("contents")
+      tableOutput("contents"),
+      verbatimTextOutput("summary")
       
     )
     
@@ -69,7 +71,15 @@ server <- function(input, output) {
                    header = input$header,
                    sep = input$sep,
                    quote = input$quote)
-    plot(df)
+    ggplot(df, aes(x=x, y=y)) + geom_point()
+  })
+  
+  output$summary <- renderPrint({
+    df <- read.csv(input$file1$datapath,
+                        header = input$header,
+                        sep = input$sep,
+                        quote = input$quote)
+    summary(df)
   })
   
   output$contents <- renderTable({
