@@ -1,4 +1,5 @@
 library(shiny)
+install.packages("tidyverse")
 library(tidyverse)
 
 # Define UI for dataset viewer app ----
