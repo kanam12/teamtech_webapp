@@ -12,9 +12,9 @@ For more information see www.ladyada.net/learn/sensors/fsr.html */
 int fsrPin = 0;     // the FSR and 10K pulldown are connected to a0
 int fsrReading;     // the analog reading from the FSR resistor divider
 int fsrVoltage;     // the analog reading converted to voltage
-unsigned long fsrResistance;  // The voltage converted to resistance, can be very big so make "long"
-unsigned long fsrConductance; 
-long fsrForce;       // Finally, the resistance converted to force
+unsigned double fsrResistance;  // The voltage converted to resistance, can be very big so make "long"
+unsigned double fsrConductance; 
+double fsrForce;       // Finally, the resistance converted to force
 int timestep = 0;
 
 
