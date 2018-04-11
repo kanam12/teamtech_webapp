@@ -27,9 +27,9 @@ ui <- fluidPage(
     
     # Main panel for displaying outputs ----
     mainPanel(
-      verbatimTextOutput("print"),
+      # plotOutput("print"),
       
-      # plotOutput("histogram"),
+      plotOutput("histogram"),
       
       plotOutput("mpgPlot"),
       
@@ -60,12 +60,21 @@ server <- function(input, output) {
     summary(dataset)
   })
   
-  output$print <- renderPrint({
+  output$print <- renderPlot({
     dataset <- datasetInput()
     x <- strtoi(dataset[1])
     y <- strtoi(dataset[2])
-    hist(dataset$x, 
-         main = 'Pls Work' )
+    qplot(y,
+          geom="histogram",
+          binwidth = 2,  
+          main = "Histogram for y Values", 
+          xlab = "y value",  
+          fill=I("blue"), 
+          col=I("red"), 
+          alpha=I(.2),
+          xlim=c(0,150))
+    # hist(dataset$x, 
+         # main = 'Pls Work' )
     # typeof(dataset)
     # dataset[2]
     # renderPrint("hello")
@@ -85,12 +94,24 @@ server <- function(input, output) {
   })
   
   output$mpgPlot <- renderPlot({
-    ggplot(datasetInput(), aes(x=x, y=y)) + geom_point()
+    # ggplot(datasetInput(), aes(x=x, y=y)) + geom_point()
+    ggplot(datasetInput(), aes(x=datasetInput()[1], y=datasetInput()[2])) + 
+      geom_point(shape=18, color="blue")+
+      geom_smooth(method=lm,  linetype="dashed",
+                  color="darkred", fill="blue")
   })
   
-  # output$histogram <- renderPlot({
-  #   hist(strtoi(datasetInput()[1]))
-  # })
+  output$histogram <- renderPlot({
+    qplot(datasetInput()[2],
+          geom="histogram",
+          binwidth = 2,  
+          main = "Histogram for Pressure", 
+          xlab = "Pressure",  
+          fill=I("blue"), 
+          col=I("red"), 
+          alpha=I(.2),
+          xlim=c(0,140))
+  })
   
 }
 
