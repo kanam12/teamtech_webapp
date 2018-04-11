@@ -53,10 +53,11 @@ ui <- fluidPage(
     
     # Main panel for displaying outputs ----
     mainPanel(
-      plotOutput("histogram"),
+      plotOutput("graph"),
       # Output: Data file ----
       tableOutput("contents"),
-      verbatimTextOutput("summary")
+      verbatimTextOutput("summary"),
+      plotOutput("histogram")
       
     )
     
@@ -66,12 +67,32 @@ ui <- fluidPage(
 # Define server logic to read selected file ----
 server <- function(input, output) {
   
+  output$graph <- renderPlot({
+    df <- read.csv(input$file1$datapath,
+                   header = input$header,
+                   sep = input$sep,
+                   quote = input$quote)
+    # ggplot(df, aes(x=x, y=y)) + geom_point()
+    ggplot(df, aes(x=df[1], y=df[2])) + 
+      geom_point(shape=18, color="blue")+
+      geom_smooth(method=lm,  linetype="dashed",
+                  color="darkred", fill="blue")
+  })
+  
   output$histogram <- renderPlot({
     df <- read.csv(input$file1$datapath,
                    header = input$header,
                    sep = input$sep,
                    quote = input$quote)
-    ggplot(df, aes(x=x, y=y)) + geom_point()
+    qplot(df[2],
+          geom="histogram",
+          binwidth = 2,  
+          main = "Histogram for Pressure", 
+          xlab = "Pressure",  
+          fill=I("blue"), 
+          col=I("red"), 
+          alpha=I(.2),
+          xlim=c(0,30))
   })
   
   output$summary <- renderPrint({
