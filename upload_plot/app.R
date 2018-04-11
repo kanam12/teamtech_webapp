@@ -73,7 +73,8 @@ server <- function(input, output) {
                    sep = input$sep,
                    quote = input$quote)
     # ggplot(df, aes(x=x, y=y)) + geom_point()
-    ggplot(df, aes(x=df[1], y=df[2])) + 
+    ##############
+    ggplot(df, aes(x=df[1], y=df[2])) +
       geom_point(shape=18, color="blue")+
       geom_smooth(method=lm,  linetype="dashed",
                   color="darkred", fill="blue")
