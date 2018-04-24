@@ -116,5 +116,5 @@ server <- function(input, output) {
 
 # Run the application 
 renderPrint("!!hello world")
-shinyApp(ui = ui, server = server)x
+shinyApp(ui = ui, server = server)
 
