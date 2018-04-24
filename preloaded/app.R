@@ -1,6 +1,7 @@
 library(shiny)
 install.packages("tidyverse")
 library(tidyverse)
+library(ggplot2)
 
 # Define UI for dataset viewer app ----
 ui <- fluidPage(
@@ -85,7 +86,7 @@ server <- function(input, output) {
   })
   
   output$mpgPlot <- renderPlot({
-    plot(datasetInput())
+    ggplot(datasetInput(), aes(x=x, y=y)) + geom_point()
   })
   
   # output$histogram <- renderPlot({
