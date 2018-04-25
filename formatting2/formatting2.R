@@ -1,6 +1,7 @@
 library(shiny)
 library(ggplot2)
 # Define UI for data upload app ----
+
 ui <- navbarPage("How's my dog doing?",
                   tabPanel("Select files",
                            h1("UC Berkeley Team Tech"),
@@ -15,6 +16,7 @@ ui <- navbarPage("How's my dog doing?",
                                                          ".csv"))
                              ),
                              column(6,
+                                    # Added drop-down box for time range selection -- NOT YET IMPLEMENTED. Source: https://shiny.rstudio.com/tutorial/written-tutorial/lesson3/
                                     selectInput("time", h3("Time range"),
                                                 choices = list("Past 30 minutes" = 1,
                                                                "Past hour" = 2,
@@ -45,6 +47,7 @@ ui <- navbarPage("How's my dog doing?",
                   tabPanel("Strain",
                            fluidRow(
                              column(8,
+                                    # Prepare plotOutput to display hover/click/etc information: source:  https://shiny.rstudio.com/articles/plot-interaction.html
                                     plotOutput("histogram2", 
                                                hover = "plot_hover2", 
                                                click = "plot_click2", 
@@ -55,7 +58,7 @@ ui <- navbarPage("How's my dog doing?",
                              column(4, 
                                     h4("Summary"),
                                     #Change the color of the background and text displayed in the summary box, use font-family: 'font name'; to change font
-                                    tags$style(type='text/css', "#summary2 {background-color: white; color: purple;}"), 
+                                    tags$style(type='text/css', "#summary2 {background-color: white; color: black;}"), 
                                     verbatimTextOutput("summary2")
                              )
                            ))
@@ -91,6 +94,8 @@ server <- function(input, output) {
                    header = TRUE,
                    sep = ",",
                    quote = '"')
+    
+    #added xlab, tlab, and ggtitle so I could implement theme lower down and change font size/color/face type 
     p <- ggplot(df, aes(x=df[1], y=df[2])) +
       geom_point(shape=18, color="blue")+
       geom_smooth(method=lm,  
@@ -101,6 +106,7 @@ server <- function(input, output) {
       ylab("Strain") +
       ggtitle("Strain over time")
 
+    # Change title/axis color/formatting and display 
     p + theme(
       plot.title = element_text(color="black", size=24),
       axis.title.x = element_text(color="black", size=18),
@@ -161,6 +167,8 @@ server <- function(input, output) {
     
     
   })
+  
+  #Set display parameters for click information. Source: https://shiny.rstudio.com/articles/plot-interaction.html
   output$info <- renderText({
     xy_str <- function(e) {
       if(is.null(e)) return("NULL\n")
@@ -180,6 +188,7 @@ server <- function(input, output) {
     )
   })
   
+  #Set display parameters for click information. Source: https://shiny.rstudio.com/articles/plot-interaction.html
   output$info2 <- renderText({
     xy_str <- function(e) {
       if(is.null(e)) return("NULL\n")
@@ -187,11 +196,13 @@ server <- function(input, output) {
     }
     xy_range_str <- function(e) {
       if(is.null(e)) return("NULL\n")
+      #Labels for displaying data. Added commas and spaces for ease of reading. 
       paste0("Min X: ", round(e$xmin, 1), ", Max X: ", round(e$xmax, 1), 
              ", Min Y: ", round(e$ymin, 1), ", Max Y: ", round(e$ymax, 1))
     }
     
     paste0(
+      #input$plot_click2 refers to plot_click2 that I defined up in plotOutput for histogram2, which allows the clicks on that histogram to be separate from histogram 1
       "Last click: ", xy_str(input$plot_click2),
       "Last double click: ", xy_str(input$plot_dblclick2),
       "Hover coordinates: ", xy_str(input$plot_hover2),
