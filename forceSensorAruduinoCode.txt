@@ -1,28 +1,31 @@
 /* Team Tech Force and Strain Sensor
- 
-Connect one end of FSR to power, the other end to Analog 0.
-Then connect one end of a 10K resistor from Analog 0 to ground 
- 
-For more information see www.ladyada.net/learn/sensors/fsr.html */
 
-//import processing.serial.*;  //for conversion
+CIRCUIT SETUP INSTRUCTIONS:
+Connect one end of FSR to power, the other end to Analog 0.
+Then connect one end of a 10K ohm resistor from Analog 0 to ground. 
+Connect one end of the strain to power, the other end to Analog 1.
+Then connect one end of a 470 ohm resistor from Analog 1 to ground.
+
+For more information on force sensor part see https://learn.adafruit.com/force-sensitive-resistor-fsr/using-an-fsr
+
+www.ladyada.net/learn/sensors/fsr.html */
 
 int fsrPin = 0;     // the FSR and 10K pulldown are connected to a0
 int fsrReading;     // the analog reading from the FSR resistor divider
 int fsrVoltage;     // the analog reading converted to voltage
-unsigned double fsrResistance;  // The voltage converted to resistance, can be very big so make "long"
-unsigned double fsrConductance; 
-double fsrForce;       // Finally, the resistance converted to force (NEWTONS)
+unsigned long fsrResistance;  // The voltage converted to resistance, can be very big so make "long"
+unsigned long fsrConductance; 
+long fsrForce;       // Finally, the resistance converted to force (NEWTONS)
 
 int timeIncrement = 1000; //in ms (delay between loops)
 int strainPin = 1; //analog pin (a1) that strain sensor is connected to
-double strain = -99; //no units, just rel
+double strain = -99; //no units, just relative magnitudes
 int timestep = 0; // start at 0 seconds
-double lastForce = -99; //initiate prev force reading recorded
+long lastForce = -99; //initiate prev force reading recorded
 double lastStrain = -99; //initiate prev strain reading recorded
 
 //Hyperparameters
-double F_THRESHOLD = 0; //The min change in force reading for us to record that data point
+double F_THRESHOLD = 0; //The min change in force (N) reading for us to record that data point
 double S_THRESHOLD = 0; //The min change in strain reading for us to record that data point
 
 
@@ -37,53 +40,48 @@ void loop(void) {
  
   /*GET PRESSURE READING (force in newtons)*/
   fsrReading = analogRead(fsrPin);  
-  //Serial.print("Analog reading = "); //Serial.println(fsrReading);
- 
+
+  /*CONVERTING FSR_READING INTO FORCE IN NEWTONS */ 
   // analog voltage reading ranges from about 0 to 1023 which maps to 0V to 5V (= 5000mV)
   fsrVoltage = map(fsrReading, 0, 1023, 0, 5000);
-  //Serial.print("Voltage reading in mV = "); //Serial.println(fsrVoltage);  
  
   if (fsrVoltage == 0) { //prevent divide by 0 error
-    //Serial.println("No pressure"); 
+    //No pressure 
     fsrForce = 0; 
   } else {
     // The voltage = Vcc * R / (R + FSR) where R = 10K and Vcc = 5V so FSR = ((Vcc - V) * R) / V
     fsrResistance = 5000 - fsrVoltage;     // fsrVoltage is in millivolts so 5V = 5000mV
     fsrResistance *= 10000;                // 10K resistor
     fsrResistance /= fsrVoltage;
-    //Serial.print("FSR resistance in ohms = "); //Serial.println(fsrResistance);
  
     fsrConductance = 1000000;  // we measure in micromhos so 
     fsrConductance /= fsrResistance;
-    //Serial.print("Conductance in microMhos: "); //Serial.println(fsrConductance);
  
-    // Use the two FSR guide graphs to approximate the force
+    // Use the two FSR guide graphs to approximate the force (N)
     if (fsrConductance <= 1000) {
       fsrForce = fsrConductance / 80;
-      //Serial.print("Force in Newtons: ");   
     } else {
       fsrForce = fsrConductance - 1000;
       fsrForce /= 30;
-      //Serial.print("Force in Newtons: ");         
     }
+    
   }
-  
   /*GET STRAIN READING*/
-  //strain = analogRead(strainPin);
+  strain = analogRead(strainPin);
     
   /*ONLY OUTPUT TO SERIAL MONITOR AND KEEP DATA IF CHANGE IS GREATER THAN THRES
-    or if its the first reading*/
+    or if it's the first reading*/
   double deltaForce = abs(fsrForce - lastForce);  
-  //double deltaStrain = abs(strain - lastStrain);
-  if (timestep == 0 || deltaForce >= F_THRESHOLD){  //|| deltaStrain >= S_THRESHOLD){
+  double deltaStrain = abs(strain - lastStrain);
+  if ( timestep == 0 || deltaStrain >= S_THRESHOLD || deltaForce >= F_THRESHOLD){
+    //time, fsrForce, strain \n
     Serial.print(timestep);
     Serial.print(",");
-    Serial.print(fsrForce);
-    Serial.println();  
-    //Serial.print(",");
-    //Serial.println(strain);  
-    lastForce = fsrForce;
-    //lastStrain = strain;
+    Serial.print(fsrForce); //if fsrForce always = 0, use fsrReading (not in Newtons anymore)
+    Serial.print(",");
+    Serial.println(strain);  
+    lastForce = fsrForce;  //change these to fsrReading if changed in line 3 above
+    lastStrain = strain;
   }
   
   delay(timeIncrement); //sample by seconds (1 sec = 1000 ms)
