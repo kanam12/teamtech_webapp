@@ -192,11 +192,11 @@ server <- function(input, output) {
   #Set display parameters for click information. Source: https://shiny.rstudio.com/articles/plot-interaction.html
   output$info2 <- renderText({
     xy_str <- function(e) {
-      if(is.null(e)) return("NULL\n")
+      if(is.null(e)) return("Click something to update!\n")
       paste0("X: ", round(e$x, 1), " Y: ", round(e$y, 1), "\n")
     }
     xy_range_str <- function(e) {
-      if(is.null(e)) return("NULL\n")
+      if(is.null(e)) return("Click something to update! \n")
       #Labels for displaying data. Added commas and spaces for ease of reading. 
       paste0("Min X: ", round(e$xmin, 1), ", Max X: ", round(e$xmax, 1), 
              ", Min Y: ", round(e$ymin, 1), ", Max Y: ", round(e$ymax, 1))
