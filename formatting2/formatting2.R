@@ -14,20 +14,21 @@ ui <- navbarPage("How's my dog doing?",
                                               accept = c("text/csv",
                                                          "text/comma-separated-values,text/plain",
                                                          ".csv"))
-                             ),
-                             column(6,
+                             )#,
+                            ## column(6,
                                     # Added drop-down box for time range selection -- NOT YET IMPLEMENTED. Source: https://shiny.rstudio.com/tutorial/written-tutorial/lesson3/
-                                    selectInput("time", h3("Time range"),
-                                                choices = list("Past 30 minutes" = 1,
-                                                               "Past hour" = 2,
-                                                               "Past day" = 3,
-                                                               "Past week" = 4,
-                                                               "Past month" = 5,
-                                                               "Past year" = 6,
-                                                               "All time" = 7),
-                                                selected = 7)
-                             )
-                           )),
+                                    ##selectInput("time", h3("Time range"),
+                                               ## choices = list("Past 30 minutes" = 1,
+                                                 ##              "Past hour" = 2,
+                                                   ##            "Past day" = 3,
+                                                     ##          "Past week" = 4,
+                                                       ##        "Past month" = 5,
+                                                         ##      "Past year" = 6,
+                                                           ##    "All time" = 7),
+                                            ##    selected = 7)
+                             ##)
+                           )
+                           ),
                  
                   tabPanel("Pressure",
                            fluidRow(
